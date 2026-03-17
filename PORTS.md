@@ -4,10 +4,10 @@ Server IP: `43.139.56.44`
 
 | Domain | Host Port | Container Port | Note |
 | --- | ---: | ---: | --- |
-| mrvn.site | 80 | 80 | main site standard HTTP |
-| www.mrvn.site | 80 | 80 | main site standard HTTP |
-| mrvn.site | 13130 | 13130 | main site fallback port |
-| www.mrvn.site | 13130 | 13130 | main site fallback port |
+| mrvn.site | 13130 | 80 | main site default host binding |
+| www.mrvn.site | 13130 | 80 | main site default host binding |
+| mrvn.site | 80 | 80 | optional if `MAIN_HTTP_HOST_PORT=80` |
+| www.mrvn.site | 80 | 80 | optional if `MAIN_HTTP_HOST_PORT=80` |
 | claw.mrvn.site | 13131 | 13131 | static site |
 | ds.mrvn.site | 13132 | 13132 | static site |
 | help.mrvn.site | 13133 | 13133 | static site |
@@ -21,8 +21,11 @@ Server IP: `43.139.56.44`
 
 Access example:
 
-- `http://mrvn.site`
-- `http://www.mrvn.site`
 - `http://mrvn.site:13130`
 - `http://zww.mrvn.site:13140`
 - `http://ai.mrvn.site:13139`
+
+If host `80` is available and you start with `MAIN_HTTP_HOST_PORT=80`:
+
+- `http://mrvn.site`
+- `http://www.mrvn.site`

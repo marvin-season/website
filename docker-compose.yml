@@ -4,8 +4,7 @@ services:
     container_name: mrvn-static-sites
     restart: unless-stopped
     ports:
-      - "80:80" # mrvn.site + www.mrvn.site (standard HTTP)
-      - "13130:13130" # mrvn.site + www.mrvn.site (high-port fallback)
+      - "${MAIN_HTTP_HOST_PORT:-13130}:80" # mrvn.site + www.mrvn.site (default 13130, optional 80)
       - "13131:13131" # claw.mrvn.site
       - "13132:13132" # ds.mrvn.site
       - "13133:13133" # help.mrvn.site
