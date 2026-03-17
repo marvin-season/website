@@ -52,6 +52,18 @@ When behavior changes, update code and docs together.
   - Introducing Node/PNPM build pipeline
   - Replacing Docker/Compose strategy
 
+## 5.1) Critical filesystem safety (must follow)
+
+- Never delete the current workspace root directory or any parent directory.
+- Forbidden commands include (but are not limited to):
+  - `rm -rf .`
+  - `rm -rf ..`
+  - `rm -rf $PWD`
+  - `rm -rf ~/website`
+  - Any wildcard/expanded variant that resolves to workspace root.
+- Before any delete operation, verify target path is inside an allowed subdirectory and is not root-level critical path.
+- If delete scope is ambiguous, stop and ask user for confirmation first.
+
 ## 6) Run / verify commands
 
 ```bash

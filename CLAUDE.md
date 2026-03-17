@@ -14,6 +14,9 @@ This file defines repo-specific instructions for Claude Code.
 - Do not add extra public ports without explicit user request.
 - Keep `zww.mrvn.site -> host 13140` proxy behavior.
 - Keep other existing subdomains as pure static unless requested otherwise.
+- Never run destructive deletion on workspace root or parent dirs.
+- Explicitly forbidden: `rm -rf .`, `rm -rf ..`, `rm -rf $PWD`, `rm -rf /Users/marvin/personal/website`.
+- Before any deletion, confirm target is a safe subpath under current workspace.
 
 ## Validation before finishing
 
