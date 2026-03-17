@@ -1,0 +1,6 @@
+{
+  "appName": "zww-service",
+  "env": "production",
+  "apiBase": "https://zww.mrvn.site/api",
+  "updatedAt": "2026-03-17T00:00:00Z"
+}

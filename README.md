@@ -46,6 +46,27 @@ curl -I http://ai.mrvn.site
 
 Full mapping is in `PORTS.md`.
 
+## zww dynamic service (http-server)
+
+`zww.mrvn.site` proxies to host `13140`, expected service source:
+
+- `services/zww-service/index.html`
+- `services/zww-service/runtime-config.json`
+
+Start command on server:
+
+```bash
+cd /path/to/website
+npx http-server ./services/zww-service -p 13140 -a 0.0.0.0 -c-1
+```
+
+Optional global install:
+
+```bash
+npm i -g http-server
+http-server ./services/zww-service -p 13140 -a 0.0.0.0 -c-1
+```
+
 ## File structure
 
 - `docker-compose.yml`: container and port exposure

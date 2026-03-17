@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>zww dynamic service</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100 antialiased">
+    <main class="mx-auto flex min-h-screen max-w-3xl items-center px-6 py-16">
+      <section id="card" class="w-full rounded-2xl border border-slate-800 bg-slate-900/70 p-8 shadow-2xl shadow-cyan-950/40 backdrop-blur">
+        <p id="badge" class="mb-4 inline-flex rounded-full border border-cyan-400/40 bg-cyan-400/10 px-3 py-1 text-xs font-medium text-cyan-300">
+          zww dynamic service
+        </p>
+        <h1 id="title" class="text-3xl font-bold tracking-tight md:text-4xl">zww.mrvn.site</h1>
+        <p id="desc" class="mt-4 text-slate-300">Service is running on host port 13140 through http-server.</p>
+
+        <div id="meta" class="mt-6 rounded-xl border border-slate-700 bg-slate-950/60 p-4 text-sm text-slate-300">
+          Loading runtime config...
+        </div>
+      </section>
+    </main>
+
+    <script type="module">
+      import { animate, stagger } from "https://cdn.jsdelivr.net/npm/motion@12.23.24/+esm";
+
+      animate("#card", { opacity: [0, 1], y: [24, 0], scale: [0.98, 1] }, { duration: 0.5, easing: "ease-out" });
+      animate(["#badge", "#title", "#desc", "#meta"], { opacity: [0, 1], y: [12, 0] }, { delay: stagger(0.08), duration: 0.45, easing: "ease-out" });
+
+      const metaEl = document.getElementById("meta");
+
+      async function loadRuntimeConfig() {
+        try {
+          const response = await fetch("./runtime-config.json", { cache: "no-store" });
+          if (!response.ok) throw new Error("failed to fetch runtime config");
+          const cfg = await response.json();
+          metaEl.innerHTML = `
+            <div><span class="text-slate-400">app:</span> ${cfg.appName}</div>
+            <div><span class="text-slate-400">env:</span> ${cfg.env}</div>
+            <div><span class="text-slate-400">apiBase:</span> ${cfg.apiBase}</div>
+            <div><span class="text-slate-400">updatedAt:</span> ${cfg.updatedAt}</div>
+          `;
+        } catch (_error) {
+          metaEl.textContent = "runtime-config.json not found or invalid.";
+        }
+      }
+
+      loadRuntimeConfig();
+    </script>
+  </body>
+</html>
