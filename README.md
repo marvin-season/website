@@ -1,6 +1,10 @@
 # Static site cluster for mrvn.site
 
 This project runs multiple static sites with `docker compose` + `nginx`.
+All site pages include:
+
+- `Tailwind CSS` via CDN: `https://cdn.tailwindcss.com`
+- `Motion` via CDN (ESM): `https://cdn.jsdelivr.net/npm/motion@12.23.24/+esm`
 
 ## Quick start
 
