@@ -4,17 +4,9 @@ services:
     container_name: mrvn-static-sites
     restart: unless-stopped
     ports:
-      - "${MAIN_HTTP_HOST_PORT:-13130}:80" # mrvn.site + www.mrvn.site (default 13130, optional 80)
-      - "13131:13131" # claw.mrvn.site
-      - "13132:13132" # ds.mrvn.site
-      - "13133:13133" # help.mrvn.site
-      - "13134:13134" # who.mrvn.site
-      - "13135:13135" # what.mrvn.site
-      - "13136:13136" # how.mrvn.site
-      - "13137:13137" # when.mrvn.site
-      - "13138:13138" # why.mrvn.site
-      - "13139:13139" # ai.mrvn.site
-      - "13140:13140" # zww.mrvn.site (required)
+      - "80:80" # all domains via vhost routing
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./sites:/usr/share/nginx/sites:ro
