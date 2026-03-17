@@ -37,17 +37,8 @@ curl -I http://ai.mrvn.site
 ## Important mapping
 
 - all subdomains are accessed directly without custom port
-- reverse proxy mapping:
-  - `claw` -> `13131`
-  - `ds` -> `13132`
-  - `help` -> `13133`
-  - `who` -> `13134`
-  - `what` -> `13135`
-  - `how` -> `13136`
-  - `when` -> `13137`
-  - `why` -> `13138`
-  - `ai` -> `13139`
-  - `zww` -> `13140`
+- pure static: `claw`, `ds`, `help`, `who`, `what`, `how`, `when`, `why`, `ai`
+- reserved service domain: `zww` reverse proxy to host `13140`
 
 Full mapping is in `PORTS.md`.
 
