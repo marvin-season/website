@@ -148,6 +148,44 @@
         box-shadow: 0 0 18px rgba(255, 255, 255, 0.42);
       }
 
+      .choice-button {
+        transition:
+          transform 180ms ease,
+          background 180ms ease,
+          border-color 180ms ease,
+          box-shadow 180ms ease;
+      }
+
+      .choice-button:hover,
+      .choice-button:focus-visible {
+        transform: translateY(-1px);
+        border-color: rgba(255, 255, 255, 0.32);
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .choice-button.is-picked {
+        border-color: rgba(255, 255, 255, 0.46);
+        background: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 0 22px rgba(125, 211, 252, 0.12);
+      }
+
+      .qa-dot {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.18);
+        transition:
+          transform 200ms ease,
+          background 200ms ease,
+          box-shadow 200ms ease;
+      }
+
+      .qa-dot.is-active {
+        background: rgba(255, 255, 255, 0.85);
+        transform: scale(1.2);
+        box-shadow: 0 0 16px rgba(255, 255, 255, 0.28);
+      }
+
       .pulse-ring {
         animation: pulse-ring 2.4s ease-in-out infinite;
       }
@@ -392,6 +430,81 @@
         </div>
       </section>
 
+      <section id="ask" class="mt-8 grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
+        <article data-reveal class="glass rounded-[2rem] border border-white/10 p-6 sm:p-7">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="text-[11px] uppercase tracking-[0.3em] text-slate-300/68">small questions</p>
+              <h2 class="mt-3 text-3xl font-semibold text-white">A gentle yes / no.</h2>
+            </div>
+            <p id="qa-step" class="text-sm text-slate-300/72">01 / 03</p>
+          </div>
+
+          <p id="qa-prompt" class="mt-6 max-w-lg text-xl font-medium leading-relaxed text-white sm:text-2xl">
+            Stay a little longer?
+          </p>
+
+          <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+            <button
+              id="qa-yes"
+              type="button"
+              class="choice-button inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-medium text-white"
+            >
+              Yes
+            </button>
+            <button
+              id="qa-no"
+              type="button"
+              class="choice-button inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-medium text-white"
+            >
+              No
+            </button>
+            <button
+              id="qa-reset"
+              type="button"
+              class="inline-flex items-center justify-center rounded-full border border-white/10 bg-transparent px-5 py-3 text-sm font-medium text-slate-300 transition hover:border-white/20 hover:text-white"
+            >
+              Start again
+            </button>
+          </div>
+
+          <div class="mt-6 flex items-center gap-2" aria-hidden="true">
+            <span class="qa-dot is-active" data-qa-dot="0"></span>
+            <span class="qa-dot" data-qa-dot="1"></span>
+            <span class="qa-dot" data-qa-dot="2"></span>
+          </div>
+
+          <p class="mt-5 text-sm leading-7 text-slate-200/72">
+            There is no wrong answer here. The page responds kindly either way.
+          </p>
+        </article>
+
+        <article
+          id="qa-response-card"
+          data-reveal
+          class="glass relative overflow-hidden rounded-[2rem] border border-white/10 p-6 sm:p-7"
+        >
+          <div class="absolute inset-y-0 right-0 w-1/2 bg-gradient-to-l from-sky-300/10 to-transparent"></div>
+          <div class="relative z-10">
+            <p class="text-[11px] uppercase tracking-[0.3em] text-slate-300/68">response</p>
+            <p id="qa-response" class="mt-4 text-2xl font-medium leading-relaxed text-white sm:text-[2rem]">
+              The sky is listening.
+            </p>
+            <p id="qa-subtext" class="mt-4 max-w-md text-sm leading-7 text-slate-200/78 sm:text-base">
+              Choose either side and the mood will shift with you.
+            </p>
+            <div class="mt-8 flex flex-wrap gap-2">
+              <span id="qa-tag" class="rounded-full border border-white/12 bg-white/6 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200/75">
+                waiting softly
+              </span>
+              <span class="rounded-full border border-white/12 bg-white/6 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200/75">
+                always warm
+              </span>
+            </div>
+          </div>
+        </article>
+      </section>
+
       <footer class="px-2 pb-2 pt-8 text-center text-xs uppercase tracking-[0.24em] text-slate-300/54 sm:text-sm">
         zww.mrvn.site
       </footer>
@@ -414,6 +527,16 @@
       const constellationMap = document.querySelector("#constellation-map");
       const starButtons = [...document.querySelectorAll("[data-star]")];
       const lineElements = [...document.querySelectorAll("[data-line]")];
+      const qaPrompt = document.querySelector("#qa-prompt");
+      const qaStep = document.querySelector("#qa-step");
+      const qaResponse = document.querySelector("#qa-response");
+      const qaSubtext = document.querySelector("#qa-subtext");
+      const qaTag = document.querySelector("#qa-tag");
+      const qaResponseCard = document.querySelector("#qa-response-card");
+      const qaYes = document.querySelector("#qa-yes");
+      const qaNo = document.querySelector("#qa-no");
+      const qaReset = document.querySelector("#qa-reset");
+      const qaDots = [...document.querySelectorAll("[data-qa-dot]")];
 
       const microLines = ["Still you.", "Quietly, you.", "Soft and sure.", "You stay warm.", "My calm light."];
       const constellationMessages = [
@@ -423,6 +546,62 @@
         "You are never loud, only certain.",
         "Even the sky feels softer near you.",
       ];
+      const qaFlow = [
+        {
+          prompt: "Stay a little longer?",
+          yes: {
+            response: "Good. The night gets better with you in it.",
+            subtext: "A soft yes adds a little more light.",
+            tag: "staying close",
+            ambient: 82,
+            star: 3,
+          },
+          no: {
+            response: "That's okay. The light can wait for you.",
+            subtext: "A gentle no still leaves the sky open.",
+            tag: "holding space",
+            ambient: 62,
+            star: 1,
+          },
+        },
+        {
+          prompt: "Should the sky glow brighter?",
+          yes: {
+            response: "Done. Just enough to feel it.",
+            subtext: "A brighter sky, not a louder one.",
+            tag: "turning up softly",
+            ambient: 92,
+            star: 4,
+          },
+          no: {
+            response: "Then we keep it dim and honest.",
+            subtext: "Low light. Clear feeling.",
+            tag: "keeping it quiet",
+            ambient: 54,
+            star: 0,
+          },
+        },
+        {
+          prompt: "Is this already enough?",
+          yes: {
+            response: "Then let this be enough, beautifully.",
+            subtext: "No extra words. Just a steady feeling.",
+            tag: "enough already",
+            ambient: 74,
+            star: 2,
+          },
+          no: {
+            response: "Then the stars can keep trying for us.",
+            subtext: "No rush. The page knows how to stay.",
+            tag: "still unfolding",
+            ambient: 80,
+            star: 4,
+          },
+        },
+      ];
+      let qaIndex = 0;
+      let qaLocked = false;
+      let qaAdvanceTimer = 0;
 
       if (starField) {
         const starCount = window.innerWidth < 640 ? 50 : 82;
@@ -541,6 +720,129 @@
           animate(microLine, { opacity: [0.4, 1], y: [10, 0] }, { duration: 0.35, easing: "ease-out" });
         });
       }
+
+      const renderQaStep = () => {
+        if (qaPrompt) {
+          qaPrompt.textContent = qaFlow[qaIndex].prompt;
+        }
+
+        if (qaStep) {
+          qaStep.textContent = `${String(qaIndex + 1).padStart(2, "0")} / ${String(qaFlow.length).padStart(2, "0")}`;
+        }
+
+        qaDots.forEach((dot, index) => {
+          dot.classList.toggle("is-active", index === qaIndex);
+        });
+      };
+
+      const setPickedButton = (picked) => {
+        if (qaYes) {
+          qaYes.classList.toggle("is-picked", picked === "yes");
+        }
+        if (qaNo) {
+          qaNo.classList.toggle("is-picked", picked === "no");
+        }
+      };
+
+      const animateQaBlock = () => {
+        if (qaResponseCard) {
+          animate(
+            qaResponseCard,
+            { opacity: [0.72, 1], y: [10, 0], scale: [0.985, 1] },
+            { duration: 0.35, easing: "ease-out" },
+          );
+        }
+      };
+
+      const answerQa = (choice) => {
+        if (qaLocked) {
+          return;
+        }
+
+        const result = qaFlow[qaIndex]?.[choice];
+
+        if (!result) {
+          return;
+        }
+
+        qaLocked = true;
+        setPickedButton(choice);
+
+        if (qaResponse) {
+          qaResponse.textContent = result.response;
+        }
+
+        if (qaSubtext) {
+          qaSubtext.textContent = result.subtext;
+        }
+
+        if (qaTag) {
+          qaTag.textContent = result.tag;
+        }
+
+        if (ambientSlider) {
+          ambientSlider.value = String(result.ambient);
+          setAmbientValue(result.ambient);
+        }
+
+        if (typeof result.star === "number") {
+          activateConstellation(result.star);
+        }
+
+        animateQaBlock();
+
+        window.clearTimeout(qaAdvanceTimer);
+        qaAdvanceTimer = window.setTimeout(() => {
+          qaIndex = (qaIndex + 1) % qaFlow.length;
+          renderQaStep();
+          setPickedButton("");
+          qaLocked = false;
+        }, 520);
+      };
+
+      if (qaYes) {
+        qaYes.addEventListener("click", () => {
+          answerQa("yes");
+        });
+      }
+
+      if (qaNo) {
+        qaNo.addEventListener("click", () => {
+          answerQa("no");
+        });
+      }
+
+      if (qaReset) {
+        qaReset.addEventListener("click", () => {
+          window.clearTimeout(qaAdvanceTimer);
+          qaLocked = false;
+          qaIndex = 0;
+          renderQaStep();
+          setPickedButton("");
+
+          if (qaResponse) {
+            qaResponse.textContent = "The sky is listening.";
+          }
+
+          if (qaSubtext) {
+            qaSubtext.textContent = "Choose either side and the mood will shift with you.";
+          }
+
+          if (qaTag) {
+            qaTag.textContent = "waiting softly";
+          }
+
+          if (ambientSlider) {
+            ambientSlider.value = "72";
+            setAmbientValue(72);
+          }
+
+          activateConstellation(2);
+          animateQaBlock();
+        });
+      }
+
+      renderQaStep();
 
       if (!prefersReducedMotion) {
         const state = { currentX: 0, currentY: 0, targetX: 0, targetY: 0 };
