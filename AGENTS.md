@@ -8,7 +8,7 @@ Repository guide for AI coding agents (Cursor / Claude Code compatible).
 - Infra: `docker + nginx` on Ubuntu server
 - Public entry: host port `80` only
 - Site mode:
-  - Pure static: `claw`, `ds`, `help`, `who`, `what`, `how`, `when`, `why`, `ai`, root (`@`, `www`)
+  - Pure static: `what`, root (`@`, `www`)
   - Dynamic reserved: `zww` -> reverse proxy to host `13140` service
 
 ## 2) Source of truth

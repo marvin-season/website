@@ -35,13 +35,13 @@ Or test using domains:
 curl -I http://mrvn.site
 curl -I http://www.mrvn.site
 curl -I http://zww.mrvn.site
-curl -I http://ai.mrvn.site
+curl -I http://what.mrvn.site
 ```
 
 ## Important mapping
 
 - all subdomains are accessed directly without custom port
-- pure static: `claw`, `ds`, `help`, `who`, `what`, `how`, `when`, `why`, `ai`
+- pure static: `what` (plus root `mrvn.site` / `www.mrvn.site`)
 - reserved service domain: `zww` reverse proxy to host `13140`
 
 Full mapping is in `PORTS.md`.
