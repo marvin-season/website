@@ -1,24 +1,622 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>zww.mrvn.site</title>
+    <meta
+      name="description"
+      content="An interactive night-sky page with concise English copy, built for zww."
+    />
+    <title>A Quiet Sky</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root {
+        color-scheme: dark;
+        --glow-strength: 0.72;
+        --sky-accent: 1;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background:
+          radial-gradient(circle at top, rgba(56, 189, 248, 0.14), transparent 28%),
+          radial-gradient(circle at 18% 16%, rgba(244, 114, 182, 0.12), transparent 26%),
+          linear-gradient(180deg, #020617 0%, #081122 48%, #020617 100%);
+      }
+
+      .star {
+        position: absolute;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.38);
+        animation: twinkle var(--twinkle-duration) ease-in-out infinite;
+        animation-delay: var(--twinkle-delay);
+      }
+
+      .orb {
+        animation: drift var(--drift-duration) ease-in-out infinite;
+      }
+
+      .glass {
+        background: linear-gradient(180deg, rgba(10, 15, 30, 0.72), rgba(10, 15, 30, 0.44));
+        backdrop-filter: blur(20px);
+      }
+
+      .interactive-card {
+        transform-style: preserve-3d;
+        will-change: transform;
+      }
+
+      .cursor-glow {
+        position: absolute;
+        inset: -18%;
+        background: radial-gradient(
+          circle at var(--pointer-x, 50%) var(--pointer-y, 40%),
+          rgba(244, 114, 182, calc(0.18 * var(--glow-strength))),
+          rgba(125, 211, 252, calc(0.14 * var(--glow-strength))) 16%,
+          transparent 42%
+        );
+        opacity: calc(0.75 * var(--glow-strength));
+      }
+
+      .shooting-star {
+        position: absolute;
+        width: 140px;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.9));
+        opacity: 0;
+        transform: rotate(-18deg);
+        animation: shooting 10s linear infinite;
+      }
+
+      .constellation-star {
+        position: absolute;
+        display: grid;
+        place-items: center;
+        border-radius: 9999px;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        background: rgba(255, 255, 255, 0.12);
+        box-shadow:
+          0 0 0 0 rgba(244, 114, 182, 0.22),
+          0 0 26px rgba(125, 211, 252, 0.14);
+        transition:
+          transform 220ms ease,
+          box-shadow 220ms ease,
+          background 220ms ease,
+          border-color 220ms ease;
+      }
+
+      .constellation-star::after {
+        content: "";
+        width: 0.55rem;
+        height: 0.55rem;
+        border-radius: 9999px;
+        background: white;
+        box-shadow: 0 0 14px rgba(255, 255, 255, 0.7);
+      }
+
+      .constellation-star:hover,
+      .constellation-star:focus-visible,
+      .constellation-star.is-active {
+        transform: scale(1.08);
+        border-color: rgba(255, 255, 255, 0.64);
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow:
+          0 0 0 12px rgba(244, 114, 182, 0.08),
+          0 0 34px rgba(125, 211, 252, 0.18);
+      }
+
+      .constellation-line {
+        position: absolute;
+        height: 1px;
+        transform-origin: left center;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.45), rgba(125, 211, 252, 0.1));
+        opacity: 0.28;
+        transition: opacity 240ms ease;
+      }
+
+      .constellation-line.is-active {
+        opacity: 0.88;
+      }
+
+      .ambient-slider {
+        appearance: none;
+        width: 100%;
+        height: 0.25rem;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.14);
+      }
+
+      .ambient-slider::-webkit-slider-thumb {
+        appearance: none;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 9999px;
+        background: white;
+        box-shadow: 0 0 18px rgba(255, 255, 255, 0.42);
+      }
+
+      .ambient-slider::-moz-range-thumb {
+        width: 1rem;
+        height: 1rem;
+        border: 0;
+        border-radius: 9999px;
+        background: white;
+        box-shadow: 0 0 18px rgba(255, 255, 255, 0.42);
+      }
+
+      .pulse-ring {
+        animation: pulse-ring 2.4s ease-in-out infinite;
+      }
+
+      @keyframes twinkle {
+        0%,
+        100% {
+          opacity: 0.34;
+          transform: scale(0.84);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.14);
+        }
+      }
+
+      @keyframes drift {
+        0%,
+        100% {
+          transform: translate3d(0, 0, 0) scale(1);
+        }
+        50% {
+          transform: translate3d(0, -16px, 0) scale(1.04);
+        }
+      }
+
+      @keyframes shooting {
+        0%,
+        76%,
+        100% {
+          opacity: 0;
+          transform: translate3d(0, 0, 0) rotate(-18deg);
+        }
+        81% {
+          opacity: 1;
+        }
+        92% {
+          opacity: 0;
+          transform: translate3d(-190px, 130px, 0) rotate(-18deg);
+        }
+      }
+
+      @keyframes pulse-ring {
+        0%,
+        100% {
+          box-shadow:
+            0 0 0 0 rgba(255, 255, 255, 0.08),
+            0 0 32px rgba(125, 211, 252, 0.12);
+        }
+        50% {
+          box-shadow:
+            0 0 0 16px rgba(255, 255, 255, 0),
+            0 0 44px rgba(244, 114, 182, 0.18);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        .star,
+        .orb,
+        .shooting-star,
+        .pulse-ring {
+          animation: none;
+        }
+      }
+    </style>
   </head>
-  <body class="min-h-screen bg-slate-950 text-slate-100 antialiased">
-    <main class="mx-auto flex min-h-screen max-w-3xl items-center px-6 py-16">
-      <section id="card" class="w-full rounded-2xl border border-slate-800 bg-slate-900/70 p-8 shadow-2xl shadow-cyan-950/40 backdrop-blur">
-        <p id="badge" class="mb-4 inline-flex rounded-full border border-cyan-400/40 bg-cyan-400/10 px-3 py-1 text-xs font-medium text-cyan-300">Tailwind + Motion CDN</p>
-        <h1 id="title" class="text-3xl font-bold tracking-tight md:text-4xl">zww.mrvn.site</h1>
-        <p id="desc" class="mt-4 text-slate-300">Reserved domain for future standalone service. Static fallback page is active.</p>
+  <body class="min-h-screen overflow-x-hidden text-slate-100 antialiased">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 overflow-hidden">
+      <div id="cursor-glow" class="cursor-glow"></div>
+      <div id="stars" data-parallax data-depth="10" class="absolute inset-0"></div>
+      <div data-parallax data-depth="18" class="absolute -left-12 top-16">
+        <div class="orb h-36 w-36 rounded-full bg-fuchsia-400/16 blur-3xl sm:h-56 sm:w-56"></div>
+      </div>
+      <div data-parallax data-depth="24" class="absolute right-0 top-1/3">
+        <div class="orb h-40 w-40 rounded-full bg-sky-400/16 blur-3xl sm:h-64 sm:w-64" style="--drift-duration: 12s"></div>
+      </div>
+      <div data-parallax data-depth="14" class="absolute bottom-12 left-1/3">
+        <div class="orb h-32 w-32 rounded-full bg-rose-300/10 blur-3xl sm:h-52 sm:w-52" style="--drift-duration: 10s"></div>
+      </div>
+      <span class="shooting-star top-[18%] right-[12%]" style="animation-delay: 1.2s"></span>
+      <span class="shooting-star top-[34%] right-[18%]" style="animation-delay: 5s"></span>
+    </div>
+
+    <main class="relative mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-5 sm:px-6 sm:py-7 lg:px-8">
+      <section
+        data-parallax-card
+        class="glass interactive-card relative overflow-hidden rounded-[2rem] border border-white/10 px-5 py-7 shadow-2xl shadow-slate-950/40 sm:px-8 sm:py-9 lg:px-12"
+      >
+        <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
+        <div class="relative z-10 grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <div class="space-y-5">
+            <p
+              data-hero
+              class="inline-flex w-fit rounded-full border border-fuchsia-300/25 bg-fuchsia-200/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.26em] text-fuchsia-100"
+            >
+              for zww, quietly
+            </p>
+            <div class="space-y-3">
+              <h1
+                data-hero
+                class="max-w-3xl text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl"
+              >
+                You make the dark
+                <span class="bg-gradient-to-r from-fuchsia-200 via-rose-100 to-sky-200 bg-clip-text text-transparent">
+                  feel soft.
+                </span>
+              </h1>
+              <p data-hero class="max-w-xl text-sm leading-7 text-slate-200/82 sm:text-base">
+                Less talk. More light. Tap the sky and let it answer.
+              </p>
+            </div>
+            <div data-hero class="flex flex-col gap-3 sm:flex-row">
+              <a
+                href="#constellation"
+                class="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-medium text-slate-950 transition hover:bg-slate-100"
+              >
+                Touch the stars
+              </a>
+              <button
+                id="shuffle-button"
+                type="button"
+                class="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/10"
+              >
+                Change the mood
+              </button>
+            </div>
+          </div>
+
+          <div data-hero class="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+            <div class="glass rounded-3xl border border-white/10 p-5">
+              <p class="text-[11px] uppercase tracking-[0.28em] text-slate-300/68">signal</p>
+              <p class="mt-3 text-lg font-medium text-white">Soft.</p>
+            </div>
+            <div class="glass rounded-3xl border border-white/10 p-5">
+              <p class="text-[11px] uppercase tracking-[0.28em] text-slate-300/68">orbit</p>
+              <p class="mt-3 text-lg font-medium text-white">Steady.</p>
+            </div>
+            <div class="glass rounded-3xl border border-white/10 p-5 sm:col-span-3 lg:col-span-1">
+              <p class="text-[11px] uppercase tracking-[0.28em] text-slate-300/68">answer</p>
+              <p id="micro-line" class="mt-3 text-lg font-medium text-white">Still you.</p>
+            </div>
+          </div>
+        </div>
       </section>
+
+      <section id="constellation" class="mt-8 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+        <div
+          data-reveal
+          class="glass relative min-h-[20rem] overflow-hidden rounded-[2rem] border border-white/10 p-4 sm:min-h-[24rem] sm:p-6"
+        >
+          <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05),transparent_52%)]"></div>
+          <div id="constellation-map" class="relative h-full w-full rounded-[1.5rem] border border-white/6 bg-slate-950/25">
+            <div class="constellation-line" data-line="0"></div>
+            <div class="constellation-line" data-line="1"></div>
+            <div class="constellation-line" data-line="2"></div>
+            <div class="constellation-line" data-line="3"></div>
+
+            <button
+              type="button"
+              data-star
+              data-index="0"
+              aria-label="Open first line"
+              class="constellation-star pulse-ring h-11 w-11 sm:h-12 sm:w-12"
+              style="left: 10%; top: 58%"
+            ></button>
+            <button
+              type="button"
+              data-star
+              data-index="1"
+              aria-label="Open second line"
+              class="constellation-star h-12 w-12 sm:h-14 sm:w-14"
+              style="left: 30%; top: 26%"
+            ></button>
+            <button
+              type="button"
+              data-star
+              data-index="2"
+              aria-label="Open third line"
+              class="constellation-star h-10 w-10 sm:h-11 sm:w-11"
+              style="left: 52%; top: 50%"
+            ></button>
+            <button
+              type="button"
+              data-star
+              data-index="3"
+              aria-label="Open fourth line"
+              class="constellation-star h-12 w-12 sm:h-14 sm:w-14"
+              style="left: 70%; top: 18%"
+            ></button>
+            <button
+              type="button"
+              data-star
+              data-index="4"
+              aria-label="Open fifth line"
+              class="constellation-star h-11 w-11 sm:h-12 sm:w-12"
+              style="left: 82%; top: 62%"
+            ></button>
+          </div>
+        </div>
+
+        <div class="grid gap-4">
+          <article data-reveal class="glass rounded-[2rem] border border-white/10 p-6 sm:p-7">
+            <p class="text-[11px] uppercase tracking-[0.3em] text-slate-300/68">interactive note</p>
+            <h2 class="mt-3 text-3xl font-semibold text-white">A small sky. Five quiet truths.</h2>
+            <p id="message-copy" class="mt-4 max-w-md text-sm leading-7 text-slate-200/82 sm:text-base">
+              Tap a star. It will speak in short lines, not speeches.
+            </p>
+          </article>
+
+          <article data-reveal class="glass rounded-[2rem] border border-white/10 p-6 sm:p-7">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <p class="text-[11px] uppercase tracking-[0.3em] text-slate-300/68">ambient control</p>
+                <p class="mt-2 text-lg font-medium text-white">Tune the glow</p>
+              </div>
+              <p id="ambient-value" class="text-sm text-sky-100/80">72%</p>
+            </div>
+            <input
+              id="ambient-slider"
+              class="ambient-slider mt-5"
+              type="range"
+              min="35"
+              max="100"
+              value="72"
+              aria-label="Adjust ambient glow"
+            />
+            <p class="mt-4 text-sm leading-7 text-slate-200/76">
+              Drag on mobile or desktop to brighten the sky.
+            </p>
+          </article>
+
+          <article data-reveal class="glass rounded-[2rem] border border-white/10 p-6 sm:p-7">
+            <p class="text-[11px] uppercase tracking-[0.3em] text-slate-300/68">last line</p>
+            <blockquote class="mt-3 text-2xl font-medium leading-relaxed text-white sm:text-[2rem]">
+              If home had a light, it would feel like you.
+            </blockquote>
+          </article>
+        </div>
+      </section>
+
+      <footer class="px-2 pb-2 pt-8 text-center text-xs uppercase tracking-[0.24em] text-slate-300/54 sm:text-sm">
+        zww.mrvn.site
+      </footer>
     </main>
 
     <script type="module">
-      import { animate, stagger } from "https://cdn.jsdelivr.net/npm/motion@12.23.24/+esm";
-      animate("#card", { opacity: [0, 1], y: [24, 0], scale: [0.98, 1] }, { duration: 0.5, easing: "ease-out" });
-      animate(["#badge", "#title", "#desc"], { opacity: [0, 1], y: [12, 0] }, { delay: stagger(0.08), duration: 0.45, easing: "ease-out" });
+      import { animate, inView, stagger } from "https://cdn.jsdelivr.net/npm/motion@12.23.24/+esm";
+
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const root = document.documentElement;
+      const starField = document.querySelector("#stars");
+      const cursorGlow = document.querySelector("#cursor-glow");
+      const parallaxTargets = [...document.querySelectorAll("[data-parallax]")];
+      const heroCard = document.querySelector("[data-parallax-card]");
+      const shuffleButton = document.querySelector("#shuffle-button");
+      const microLine = document.querySelector("#micro-line");
+      const messageCopy = document.querySelector("#message-copy");
+      const ambientSlider = document.querySelector("#ambient-slider");
+      const ambientValue = document.querySelector("#ambient-value");
+      const constellationMap = document.querySelector("#constellation-map");
+      const starButtons = [...document.querySelectorAll("[data-star]")];
+      const lineElements = [...document.querySelectorAll("[data-line]")];
+
+      const microLines = ["Still you.", "Quietly, you.", "Soft and sure.", "You stay warm.", "My calm light."];
+      const constellationMessages = [
+        "You feel like peace with a pulse.",
+        "You turn silence into something kind.",
+        "You make ordinary nights look rare.",
+        "You are never loud, only certain.",
+        "Even the sky feels softer near you.",
+      ];
+
+      if (starField) {
+        const starCount = window.innerWidth < 640 ? 50 : 82;
+
+        for (let i = 0; i < starCount; i += 1) {
+          const star = document.createElement("span");
+          const size = Math.random() * 2.3 + 0.8;
+
+          star.className = "star";
+          star.style.width = `${size}px`;
+          star.style.height = `${size}px`;
+          star.style.left = `${Math.random() * 100}%`;
+          star.style.top = `${Math.random() * 100}%`;
+          star.style.opacity = `${Math.random() * 0.65 + 0.2}`;
+          star.style.setProperty("--twinkle-duration", `${Math.random() * 4 + 3}s`);
+          star.style.setProperty("--twinkle-delay", `${Math.random() * 5}s`);
+          star.dataset.depth = `${Math.random() * 8 + 4}`;
+
+          starField.appendChild(star);
+        }
+      }
+
+      animate(
+        "[data-hero]",
+        { opacity: [0, 1], y: [18, 0], filter: ["blur(10px)", "blur(0px)"] },
+        { delay: stagger(0.08), duration: 0.68, easing: "ease-out" },
+      );
+
+      inView("[data-reveal]", (element) => {
+        animate(
+          element,
+          { opacity: [0, 1], y: [22, 0], filter: ["blur(10px)", "blur(0px)"] },
+          { duration: 0.62, easing: "ease-out" },
+        );
+      });
+
+      const setAmbientValue = (value) => {
+        const amount = Number(value);
+        root.style.setProperty("--glow-strength", String(amount / 100));
+        root.style.setProperty("--sky-accent", String(amount / 100));
+
+        if (ambientValue) {
+          ambientValue.textContent = `${amount}%`;
+        }
+      };
+
+      if (ambientSlider) {
+        setAmbientValue(ambientSlider.value);
+        ambientSlider.addEventListener("input", (event) => {
+          setAmbientValue(event.target.value);
+        });
+      }
+
+      const activateConstellation = (index) => {
+        starButtons.forEach((button, buttonIndex) => {
+          button.classList.toggle("is-active", buttonIndex === index);
+        });
+
+        lineElements.forEach((line, lineIndex) => {
+          line.classList.toggle("is-active", lineIndex < index);
+        });
+
+        if (messageCopy) {
+          messageCopy.textContent = constellationMessages[index];
+          animate(messageCopy, { opacity: [0.45, 1], y: [8, 0] }, { duration: 0.35, easing: "ease-out" });
+        }
+      };
+
+      const layoutConstellation = () => {
+        if (!constellationMap) {
+          return;
+        }
+
+        const points = starButtons.map((button) => {
+          const left = button.offsetLeft + button.offsetWidth / 2;
+          const top = button.offsetTop + button.offsetHeight / 2;
+          return { left, top };
+        });
+
+        points.slice(0, -1).forEach((point, index) => {
+          const next = points[index + 1];
+          const line = lineElements[index];
+
+          if (!line || !next) {
+            return;
+          }
+
+          const length = Math.hypot(next.left - point.left, next.top - point.top);
+          const angle = Math.atan2(next.top - point.top, next.left - point.left);
+
+          line.style.width = `${length}px`;
+          line.style.left = `${point.left}px`;
+          line.style.top = `${point.top}px`;
+          line.style.transform = `rotate(${angle}rad)`;
+        });
+      };
+
+      starButtons.forEach((button, index) => {
+        button.addEventListener("click", () => {
+          activateConstellation(index);
+        });
+      });
+
+      activateConstellation(2);
+      window.addEventListener("resize", layoutConstellation);
+      window.addEventListener("load", layoutConstellation);
+      layoutConstellation();
+
+      if (shuffleButton && microLine) {
+        let moodIndex = 0;
+
+        shuffleButton.addEventListener("click", () => {
+          moodIndex = (moodIndex + 1) % microLines.length;
+          microLine.textContent = microLines[moodIndex];
+          activateConstellation(moodIndex);
+          animate(microLine, { opacity: [0.4, 1], y: [10, 0] }, { duration: 0.35, easing: "ease-out" });
+        });
+      }
+
+      if (!prefersReducedMotion) {
+        const state = { currentX: 0, currentY: 0, targetX: 0, targetY: 0 };
+        let frameId = 0;
+
+        const setTargetFromPoint = (clientX, clientY) => {
+          state.targetX = (clientX / window.innerWidth - 0.5) * 2;
+          state.targetY = (clientY / window.innerHeight - 0.5) * 2;
+
+          if (cursorGlow) {
+            cursorGlow.style.setProperty("--pointer-x", `${(clientX / window.innerWidth) * 100}%`);
+            cursorGlow.style.setProperty("--pointer-y", `${(clientY / window.innerHeight) * 100}%`);
+          }
+        };
+
+        const renderParallax = () => {
+          state.currentX += (state.targetX - state.currentX) * 0.07;
+          state.currentY += (state.targetY - state.currentY) * 0.07;
+
+          parallaxTargets.forEach((element) => {
+            const depth = Number(element.dataset.depth || 0);
+            element.style.transform = `translate3d(${state.currentX * depth}px, ${state.currentY * depth}px, 0)`;
+          });
+
+          if (starField) {
+            starField.querySelectorAll(".star").forEach((star) => {
+              const depth = Number(star.dataset.depth || 0);
+              star.style.translate = `${state.currentX * depth}px ${state.currentY * depth}px`;
+            });
+          }
+
+          if (heroCard) {
+            const rotateY = state.currentX * 4.5;
+            const rotateX = state.currentY * -3.5;
+            const moveY = state.currentY * 5;
+
+            heroCard.style.transform =
+              `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translate3d(0, ${moveY}px, 0)`;
+          }
+
+          frameId = window.requestAnimationFrame(renderParallax);
+        };
+
+        const resetTarget = () => {
+          state.targetX = 0;
+          state.targetY = 0;
+        };
+
+        window.addEventListener("mousemove", (event) => {
+          setTargetFromPoint(event.clientX, event.clientY);
+        });
+
+        window.addEventListener(
+          "touchmove",
+          (event) => {
+            const touch = event.touches[0];
+
+            if (touch) {
+              setTargetFromPoint(touch.clientX, touch.clientY);
+            }
+          },
+          { passive: true },
+        );
+
+        window.addEventListener("mouseleave", resetTarget);
+        window.addEventListener("touchend", resetTarget);
+        window.addEventListener("touchcancel", resetTarget);
+        window.addEventListener("blur", resetTarget);
+
+        setTargetFromPoint(window.innerWidth * 0.5, window.innerHeight * 0.35);
+        frameId = window.requestAnimationFrame(renderParallax);
+
+        window.addEventListener("beforeunload", () => {
+          window.cancelAnimationFrame(frameId);
+        });
+      }
     </script>
   </body>
 </html>
