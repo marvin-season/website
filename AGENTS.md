@@ -8,14 +8,12 @@ Repository guide for AI coding agents (Cursor / Claude Code compatible).
 - Infra: `docker + nginx` on Ubuntu server
 - Public entry: host port `80` only
 - Site mode:
-  - Pure static: `what`, root (`@`, `www`)
-  - Dynamic reserved: `zww` -> reverse proxy to host `13140` service
+  - Pure static: `what`, `zww`, root (`@`, `www`)
 
 ## 2) Source of truth
 
 - Nginx vhost config: `nginx/conf.d/sites.conf`
 - Static pages: `sites/<subdomain>/index.html`
-- zww dynamic service files: `services/zww-service/*`
 - Compose runtime: `docker-compose.yml`
 - Mapping docs: `PORTS.md`, `README.md`
 
@@ -34,16 +32,13 @@ When behavior changes, update code and docs together.
 
 - All domains are accessed without custom port from user side.
 - Keep Nginx `listen 80;` for each vhost.
-- `zww.mrvn.site` must proxy to `host.docker.internal:13140`.
+- `zww.mrvn.site` should remain pure static by default.
 - Other subdomains should remain pure static unless user asks to switch.
-- Preserve headers in proxy blocks:
-  - `Host`, `X-Real-IP`, `X-Forwarded-For`, `X-Forwarded-Proto`
 
 ## 5) Safe change boundaries
 
 - Allowed by default:
   - Edit static HTML files under `sites/`
-  - Edit `services/zww-service/*`
   - Edit `nginx/conf.d/sites.conf`
   - Edit docs
 - Must ask before:
@@ -80,18 +75,12 @@ curl -I -H 'Host: what.mrvn.site' http://127.0.0.1
 curl -I -H 'Host: zww.mrvn.site' http://127.0.0.1
 ```
 
-zww dynamic service local start:
-
-```bash
-npx http-server ./services/zww-service -p 13140 -a 0.0.0.0 -c-1
-```
-
 ## 7) Delivery checklist (every change)
 
 - Config parses: `docker compose config` passes
 - Container healthy: `docker compose ps` shows running
 - At least one static domain returns `200`
-- `zww` behavior matches expected mode (proxy to `13140`)
+- `zww` behavior matches expected mode (pure static)
 - `README.md` / `PORTS.md` updated if routing or behavior changed
 
 ## 8) Commit message style
@@ -100,7 +89,7 @@ Prefer concise scope + purpose:
 
 - `chore: update nginx vhost routing docs`
 - `feat: improve static site template with CDN motion`
-- `fix: restore zww reverse proxy to host 13140`
+- `fix: keep zww as pure static site`
 
 ## 9) Quick task playbooks
 
@@ -110,9 +99,9 @@ Prefer concise scope + purpose:
   3. Update `PORTS.md` and `README.md`
   4. Restart compose and verify
 
-- Switch one domain to dynamic service:
-  1. Replace its `location` with `proxy_pass`
-  2. Keep proxy headers
-  3. Ensure backend service listens on host target port
+- Keep one domain static:
+  1. Set `root /usr/share/nginx/sites/<name>`
+  2. Keep `index index.html` and `try_files`
+  3. Ensure `sites/<name>/index.html` exists
   4. Verify with `curl -H 'Host: ...'`
 

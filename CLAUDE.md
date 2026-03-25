@@ -12,7 +12,7 @@ This file defines repo-specific instructions for Claude Code.
 - Prefer minimal, targeted edits.
 - Keep current architecture (`docker + nginx + static pages`) unless asked.
 - Do not add extra public ports without explicit user request.
-- Keep `zww.mrvn.site -> host 13140` proxy behavior.
+- Keep `zww.mrvn.site` as pure static site unless explicitly requested otherwise.
 - Keep other existing subdomains as pure static unless requested otherwise.
 - Never run destructive deletion on workspace root or parent dirs.
 - Explicitly forbidden: `rm -rf .`, `rm -rf ..`, `rm -rf $PWD`, `rm -rf /Users/marvin/personal/website`.

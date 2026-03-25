@@ -7,7 +7,7 @@ Server IP: `43.139.56.44`
 | mrvn.site | 80 | 80 | main site |
 | www.mrvn.site | 80 | 80 | main site |
 | what.mrvn.site | 80 | 80 | pure static site |
-| zww.mrvn.site | 80 | 80 | reverse proxy -> host `13140` (`http-server` dynamic service) |
+| zww.mrvn.site | 80 | 80 | pure static site |
 
 Access example:
 
