@@ -3,29 +3,29 @@ import { animate, inView, stagger } from "https://cdn.jsdelivr.net/npm/motion@12
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const content = {
-  microLines: ["Still you.", "Quietly, you.", "Soft and sure.", "You stay warm.", "My calm light."],
+  microLines: ["Loopy says hi.", "Pink and cozy.", "Soft fan energy.", "Cute and glowing.", "Collected softly."],
   constellationMessages: [
-    "You feel like peace with a pulse.",
-    "You turn silence into something kind.",
-    "You make ordinary nights look rare.",
-    "You are never loud, only certain.",
-    "Even the sky feels softer near you.",
+    "Loopy turns the whole page into a soft pink hello.",
+    "A tiny cute face can make the whole mood lighter.",
+    "This fan page stays sweet without trying too hard.",
+    "Romantic pink, soft glow, and one silly little star.",
+    "Collected with love, kept personal, never commercial.",
   ],
   qaFlow: [
     {
-      prompt: "Stay a little longer?",
-      yes: ["Good. The night gets better with you in it.", "A soft yes adds a little more light.", "staying close", 82, 3],
-      no: ["That's okay. The light can wait for you.", "A gentle no still leaves the sky open.", "holding space", 62, 1],
+      prompt: "Keep this page extra pink?",
+      yes: ["Perfect. Loopy likes the brighter blush.", "More pink, same soft mood.", "pink mode on", 86, 3],
+      no: ["Okay. We can keep it soft and muted.", "Still cute, just quieter.", "soft mode on", 62, 1],
     },
     {
-      prompt: "Should the sky glow brighter?",
-      yes: ["Done. Just enough to feel it.", "A brighter sky, not a louder one.", "turning up softly", 92, 4],
-      no: ["Then we keep it dim and honest.", "Low light. Clear feeling.", "keeping it quiet", 54, 0],
+      prompt: "Should Loopy shine a little more?",
+      yes: ["Done. Just enough sparkle for the room.", "The cute level went up a little.", "sparkle added", 94, 4],
+      no: ["Then we keep the glow gentle.", "Less glitter, same warmth.", "gentle sparkle", 58, 0],
     },
     {
-      prompt: "Is this already enough?",
-      yes: ["Then let this be enough, beautifully.", "No extra words. Just a steady feeling.", "enough already", 74, 2],
-      no: ["Then the stars can keep trying for us.", "No rush. The page knows how to stay.", "still unfolding", 80, 4],
+      prompt: "Is this cute enough already?",
+      yes: ["Yes. The room is sweet exactly like this.", "No more needed, the mood is set.", "already adorable", 76, 2],
+      no: ["Then Loopy can keep trying for you.", "We can stay here and soften it more.", "still getting cuter", 84, 4],
     },
   ],
 };
@@ -195,9 +195,9 @@ function resetQa() {
   state.qaIndex = 0;
   renderQaStep();
   setPickedButton();
-  setText(ui.qaResponse, "The sky is listening.");
-  setText(ui.qaSubtext, "Choose either side and the mood will shift with you.");
-  setText(ui.qaTag, "waiting softly");
+  setText(ui.qaResponse, "Loopy is listening.");
+  setText(ui.qaSubtext, "Pick either side and the room will soften with you.");
+  setText(ui.qaTag, "pink and waiting");
 
   if (ui.ambientSlider) {
     ui.ambientSlider.value = "72";

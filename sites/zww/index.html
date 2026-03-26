@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="An interactive night-sky page with concise English copy, built for zww."
+      content="A pink romantic Loopy fan page for zww, with local personal-collection images and gentle interactive moments."
     />
-    <title>A Quiet Sky</title>
+    <title>Loopy Pink Room</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="./assets/styles.css" />
   </head>
@@ -16,16 +16,17 @@
       <div id="cursor-glow" class="cursor-glow"></div>
       <div id="stars" data-parallax data-depth="10" class="absolute inset-0"></div>
       <div data-parallax data-depth="18" class="absolute -left-12 top-16">
-        <div class="orb h-36 w-36 rounded-full bg-fuchsia-400/16 blur-3xl sm:h-56 sm:w-56"></div>
+        <div class="orb h-28 w-28 rounded-full bg-pink-200/30 blur-3xl sm:h-40 sm:w-40"></div>
       </div>
       <div data-parallax data-depth="24" class="absolute right-0 top-1/3">
-        <div class="orb h-40 w-40 rounded-full bg-sky-400/16 blur-3xl sm:h-64 sm:w-64" style="--drift-duration: 12s"></div>
+        <div class="orb h-32 w-32 rounded-full bg-rose-200/24 blur-3xl sm:h-46 sm:w-46" style="--drift-duration: 12s"></div>
       </div>
       <div data-parallax data-depth="14" class="absolute bottom-12 left-1/3">
-        <div class="orb h-32 w-32 rounded-full bg-rose-300/10 blur-3xl sm:h-52 sm:w-52" style="--drift-duration: 10s"></div>
+        <div class="orb h-24 w-24 rounded-full bg-pink-100/28 blur-3xl sm:h-36 sm:w-36" style="--drift-duration: 10s"></div>
       </div>
-      <span class="shooting-star top-[18%] right-[12%]" style="animation-delay: 1.2s"></span>
-      <span class="shooting-star top-[34%] right-[18%]" style="animation-delay: 5s"></span>
+      <span class="heart-spark top-[18%] right-[12%]" style="animation-delay: 1.2s"></span>
+      <span class="heart-spark top-[34%] right-[18%]" style="animation-delay: 5s"></span>
+      <span class="heart-spark left-[10%] top-[52%]" style="animation-delay: 2.8s"></span>
     </div>
 
     <main class="relative mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-5 sm:px-6 sm:py-7 lg:px-8">
@@ -40,51 +41,58 @@
               data-hero
               class="inline-flex w-fit rounded-full border border-fuchsia-300/25 bg-fuchsia-200/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.26em] text-fuchsia-100"
             >
-              for zww, quietly
+              loopy pink archive
             </p>
             <div class="space-y-3">
               <h1
                 data-hero
                 class="max-w-3xl text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl"
               >
-                You make the dark
-                <span class="bg-gradient-to-r from-fuchsia-200 via-rose-100 to-sky-200 bg-clip-text text-transparent">
-                  feel soft.
+                A pink little world
+                <span class="bg-gradient-to-r from-pink-200 via-rose-100 to-fuchsia-200 bg-clip-text text-transparent">
+                  with Loopy.
                 </span>
               </h1>
               <p data-hero class="max-w-xl text-sm leading-7 text-slate-200/82 sm:text-base">
-                Less talk. More light. Tap the sky and let it answer.
+                Romantic, soft, and a little silly. Tap around, browse the Loopy collection, and keep it personal.
               </p>
             </div>
             <div data-hero class="flex flex-col gap-3 sm:flex-row">
               <a
-                href="#constellation"
+                href="#gallery"
                 class="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-medium text-slate-950 transition hover:bg-slate-100"
               >
-                Touch the stars
+                Open Loopy gallery
               </a>
               <button
                 id="shuffle-button"
                 type="button"
                 class="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/10"
               >
-                Change the mood
+                Change the vibe
               </button>
             </div>
+            <p data-hero class="max-w-xl text-xs leading-6 text-pink-100/78">
+              Loopy images below are marked as fan-use only, non-commercial, and kept here as a personal collection.
+            </p>
           </div>
 
           <div data-hero class="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-            <div class="glass rounded-3xl border border-white/10 p-5">
-              <p class="text-[11px] uppercase tracking-[0.28em] text-slate-300/68">signal</p>
-              <p class="mt-3 text-lg font-medium text-white">Soft.</p>
+            <div class="glass relative overflow-hidden rounded-3xl border border-white/10 p-5">
+              <span class="loopy-sticker-badge">fan pick</span>
+              <img
+                src="./assets/images/0a9b21ca7dee2d22e2c1f7f116e940c9.gif"
+                alt="Cute Loopy animated sticker"
+                class="hero-loopy mx-auto h-20 w-20 rounded-[1.4rem] object-cover sm:h-24 sm:w-24"
+              />
             </div>
             <div class="glass rounded-3xl border border-white/10 p-5">
-              <p class="text-[11px] uppercase tracking-[0.28em] text-slate-300/68">orbit</p>
-              <p class="mt-3 text-lg font-medium text-white">Steady.</p>
+              <p class="text-[11px] uppercase tracking-[0.28em] text-slate-300/68">mood</p>
+              <p class="mt-3 text-lg font-medium text-white">Pink. Cozy. Playful.</p>
             </div>
             <div class="glass rounded-3xl border border-white/10 p-5 sm:col-span-3 lg:col-span-1">
-              <p class="text-[11px] uppercase tracking-[0.28em] text-slate-300/68">answer</p>
-              <p id="micro-line" class="mt-3 text-lg font-medium text-white">Still you.</p>
+              <p class="text-[11px] uppercase tracking-[0.28em] text-slate-300/68">now playing</p>
+              <p id="micro-line" class="mt-3 text-lg font-medium text-white">Loopy says hi.</p>
             </div>
           </div>
         </div>
@@ -148,9 +156,9 @@
         <div class="grid gap-4">
           <article data-reveal class="glass rounded-[2rem] border border-white/10 p-6 sm:p-7">
             <p class="text-[11px] uppercase tracking-[0.3em] text-slate-300/68">interactive note</p>
-            <h2 class="mt-3 text-3xl font-semibold text-white">A small sky. Five quiet truths.</h2>
+            <h2 class="mt-3 text-3xl font-semibold text-white">Five sweet notes from Loopy.</h2>
             <p id="message-copy" class="mt-4 max-w-md text-sm leading-7 text-slate-200/82 sm:text-base">
-              Tap a star. It will speak in short lines, not speeches.
+              Tap a star. Each one opens a tiny pink message.
             </p>
           </article>
 
@@ -158,9 +166,9 @@
             <div class="flex items-center justify-between gap-4">
               <div>
                 <p class="text-[11px] uppercase tracking-[0.3em] text-slate-300/68">ambient control</p>
-                <p class="mt-2 text-lg font-medium text-white">Tune the glow</p>
+                <p class="mt-2 text-lg font-medium text-white">Tune the pink glow</p>
               </div>
-              <p id="ambient-value" class="text-sm text-sky-100/80">72%</p>
+              <p id="ambient-value" class="text-sm text-pink-100/80">72%</p>
             </div>
             <input
               id="ambient-slider"
@@ -172,17 +180,61 @@
               aria-label="Adjust ambient glow"
             />
             <p class="mt-4 text-sm leading-7 text-slate-200/76">
-              Drag on mobile or desktop to brighten the sky.
+              Drag on mobile or desktop to brighten the romantic glow.
             </p>
           </article>
 
           <article data-reveal class="glass rounded-[2rem] border border-white/10 p-6 sm:p-7">
-            <p class="text-[11px] uppercase tracking-[0.3em] text-slate-300/68">last line</p>
+            <p class="text-[11px] uppercase tracking-[0.3em] text-slate-300/68">little caption</p>
             <blockquote class="mt-3 text-2xl font-medium leading-relaxed text-white sm:text-[2rem]">
-              If home had a light, it would feel like you.
+              If cuteness had a room, Loopy would already live there.
             </blockquote>
           </article>
         </div>
+      </section>
+
+      <section id="gallery" class="mt-8 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+        <article data-reveal class="glass rounded-[2rem] border border-white/10 p-6 sm:p-7">
+          <p class="text-[11px] uppercase tracking-[0.3em] text-slate-300/68">loopy archive</p>
+          <h2 class="mt-3 text-3xl font-semibold text-white">Cute frames, collected softly.</h2>
+          <p class="mt-4 max-w-lg text-sm leading-7 text-slate-200/82 sm:text-base">
+            A small local gallery for the Korean viral character Loopy, restyled into this pink romantic page.
+          </p>
+          <div class="loopy-note mt-6 rounded-[1.5rem] border border-pink-200/18 bg-pink-100/8 p-4 text-sm leading-7 text-pink-50/88">
+            <p class="font-medium uppercase tracking-[0.2em] text-pink-100/80">Notice</p>
+            <p class="mt-2">Loopy image assets are shown here for personal collection and fan appreciation only.</p>
+            <p>Non-commercial use only. Please remove or replace before any public commercial usage.</p>
+          </div>
+        </article>
+
+        <article data-reveal class="glass rounded-[2rem] border border-white/10 p-4 sm:p-5">
+          <div class="loopy-gallery grid gap-4 sm:grid-cols-2">
+            <figure class="loopy-card loopy-card--tall">
+              <img src="./assets/images/47f59fd64ae0d1b02bc3257f5b1b4907.gif" alt="Animated Loopy pose" loading="lazy" />
+            </figure>
+            <figure class="loopy-card">
+              <img src="./assets/images/46b6dd8406a9cbb284d569b27bfa294b.png" alt="Loopy portrait sticker" loading="lazy" />
+            </figure>
+            <figure class="loopy-card">
+              <img src="./assets/images/2528876ab389b2c18e7604cb0cafb7fc.jpg" alt="Loopy fan image" loading="lazy" />
+            </figure>
+            <figure class="loopy-card loopy-card--wide">
+              <img src="./assets/images/f48867e09c9852ed7640bb7a41d6c323.png" alt="Loopy pink collection card" loading="lazy" />
+            </figure>
+            <figure class="loopy-card">
+              <img src="./assets/images/e13fba0a29b78aeb6da52f1a6d342d89.png" alt="Loopy cute expression" loading="lazy" />
+            </figure>
+            <figure class="loopy-card">
+              <img src="./assets/images/63a56c9d6923e94694c7fba520c7d615.png" alt="Loopy soft pink frame" loading="lazy" />
+            </figure>
+            <figure class="loopy-card">
+              <img src="./assets/images/23bda2ec4a8c4287cdd6f1c42356a483.png" alt="Loopy playful sticker" loading="lazy" />
+            </figure>
+            <figure class="loopy-card">
+              <img src="./assets/images/0a9b21ca7dee2d22e2c1f7f116e940c9.gif" alt="Animated Loopy close-up" loading="lazy" />
+            </figure>
+          </div>
+        </article>
       </section>
 
       <section id="ask" class="mt-8 grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
@@ -190,13 +242,13 @@
           <div class="flex items-center justify-between gap-4">
             <div>
               <p class="text-[11px] uppercase tracking-[0.3em] text-slate-300/68">small questions</p>
-              <h2 class="mt-3 text-3xl font-semibold text-white">A gentle yes / no.</h2>
+              <h2 class="mt-3 text-3xl font-semibold text-white">A tiny pink yes / no.</h2>
             </div>
             <p id="qa-step" class="text-sm text-slate-300/72">01 / 03</p>
           </div>
 
           <p id="qa-prompt" class="mt-6 max-w-lg text-xl font-medium leading-relaxed text-white sm:text-2xl">
-            Stay a little longer?
+            Keep this page extra pink?
           </p>
 
           <div class="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -219,7 +271,7 @@
               type="button"
               class="inline-flex items-center justify-center rounded-full border border-white/10 bg-transparent px-5 py-3 text-sm font-medium text-slate-300 transition hover:border-white/20 hover:text-white"
             >
-              Start again
+              Reset mood
             </button>
           </div>
 
@@ -230,7 +282,7 @@
           </div>
 
           <p class="mt-5 text-sm leading-7 text-slate-200/72">
-            There is no wrong answer here. The page responds kindly either way.
+            Every answer keeps the page soft and cute anyway.
           </p>
         </article>
 
@@ -239,21 +291,21 @@
           data-reveal
           class="glass relative overflow-hidden rounded-[2rem] border border-white/10 p-6 sm:p-7"
         >
-          <div class="absolute inset-y-0 right-0 w-1/2 bg-gradient-to-l from-sky-300/10 to-transparent"></div>
+          <div class="absolute inset-y-0 right-0 w-1/2 bg-gradient-to-l from-pink-300/16 to-transparent"></div>
           <div class="relative z-10">
             <p class="text-[11px] uppercase tracking-[0.3em] text-slate-300/68">response</p>
             <p id="qa-response" class="mt-4 text-2xl font-medium leading-relaxed text-white sm:text-[2rem]">
-              The sky is listening.
+              Loopy is listening.
             </p>
             <p id="qa-subtext" class="mt-4 max-w-md text-sm leading-7 text-slate-200/78 sm:text-base">
-              Choose either side and the mood will shift with you.
+              Pick either side and the room will soften with you.
             </p>
             <div class="mt-8 flex flex-wrap gap-2">
               <span id="qa-tag" class="rounded-full border border-white/12 bg-white/6 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200/75">
-                waiting softly
+                pink and waiting
               </span>
               <span class="rounded-full border border-white/12 bg-white/6 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200/75">
-                always warm
+                fan collection
               </span>
             </div>
           </div>
@@ -261,7 +313,7 @@
       </section>
 
       <footer class="px-2 pb-2 pt-8 text-center text-xs uppercase tracking-[0.24em] text-slate-300/54 sm:text-sm">
-        zww.mrvn.site
+        zww.mrvn.site · loopy fan page · personal only · non-commercial
       </footer>
     </main>
     <script type="module" src="./assets/app.js"></script>
