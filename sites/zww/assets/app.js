@@ -1,11 +1,5 @@
 import { animate, inView, stagger } from "https://cdn.jsdelivr.net/npm/motion@12.23.24/+esm";
 
-const $ = window.jQuery;
-
-if (!$) {
-  throw new Error("jQuery is required for zww site interactions.");
-}
-
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const content = {
@@ -52,66 +46,101 @@ const state = {
 
 const ui = {};
 
-const flash = (target, props = { opacity: [0.45, 1], y: [8, 0] }) =>
-  animate(target, props, { duration: 0.35, easing: "ease-out" });
+const select = (selector, parent = document) => parent.querySelector(selector);
+const selectAll = (selector, parent = document) => Array.from(parent.querySelectorAll(selector));
+
+function setText(element, value) {
+  if (element) {
+    element.textContent = value;
+  }
+}
+
+function setStyles(element, styles) {
+  if (!element) {
+    return;
+  }
+
+  Object.entries(styles).forEach(([name, value]) => {
+    element.style.setProperty(name, value);
+  });
+}
+
+function toggleClass(element, className, force) {
+  if (element) {
+    element.classList.toggle(className, force);
+  }
+}
+
+function flash(target, props = { opacity: [0.45, 1], y: [8, 0] }) {
+  if (!target) {
+    return null;
+  }
+
+  return animate(target, props, { duration: 0.35, easing: "ease-out" });
+}
 
 function cacheUi() {
-  ui.$win = $(window);
-  ui.$root = $(document.documentElement);
-  ui.$stars = $("#stars");
-  ui.$cursorGlow = $("#cursor-glow");
-  ui.$parallaxTargets = $("[data-parallax]");
-  ui.$heroCard = $("[data-parallax-card]");
-  ui.$shuffleButton = $("#shuffle-button");
-  ui.$microLine = $("#micro-line");
-  ui.$messageCopy = $("#message-copy");
-  ui.$ambientSlider = $("#ambient-slider");
-  ui.$ambientValue = $("#ambient-value");
-  ui.$constellationMap = $("#constellation-map");
-  ui.$starButtons = $("[data-star]");
-  ui.$lineElements = $("[data-line]");
-  ui.$qaPrompt = $("#qa-prompt");
-  ui.$qaStep = $("#qa-step");
-  ui.$qaResponse = $("#qa-response");
-  ui.$qaSubtext = $("#qa-subtext");
-  ui.$qaTag = $("#qa-tag");
-  ui.$qaResponseCard = $("#qa-response-card");
-  ui.$qaYes = $("#qa-yes");
-  ui.$qaNo = $("#qa-no");
-  ui.$qaReset = $("#qa-reset");
-  ui.$qaDots = $("[data-qa-dot]");
+  ui.window = window;
+  ui.root = document.documentElement;
+  ui.stars = select("#stars");
+  ui.cursorGlow = select("#cursor-glow");
+  ui.parallaxTargets = selectAll("[data-parallax]");
+  ui.heroCard = select("[data-parallax-card]");
+  ui.shuffleButton = select("#shuffle-button");
+  ui.microLine = select("#micro-line");
+  ui.messageCopy = select("#message-copy");
+  ui.ambientSlider = select("#ambient-slider");
+  ui.ambientValue = select("#ambient-value");
+  ui.constellationMap = select("#constellation-map");
+  ui.starButtons = selectAll("[data-star]");
+  ui.lineElements = selectAll("[data-line]");
+  ui.qaPrompt = select("#qa-prompt");
+  ui.qaStep = select("#qa-step");
+  ui.qaResponse = select("#qa-response");
+  ui.qaSubtext = select("#qa-subtext");
+  ui.qaTag = select("#qa-tag");
+  ui.qaResponseCard = select("#qa-response-card");
+  ui.qaYes = select("#qa-yes");
+  ui.qaNo = select("#qa-no");
+  ui.qaReset = select("#qa-reset");
+  ui.qaDots = selectAll("[data-qa-dot]");
+  ui.dynamicStars = [];
 }
 
 function setAmbientValue(value) {
   const amount = Number(value);
 
-  ui.$root.css({
-    "--glow-strength": String(amount / 100),
-    "--sky-accent": String(amount / 100),
-  });
-  ui.$ambientValue.text(`${amount}%`);
+  ui.root.style.setProperty("--glow-strength", String(amount / 100));
+  ui.root.style.setProperty("--sky-accent", String(amount / 100));
+  setText(ui.ambientValue, `${amount}%`);
 }
 
 function activateConstellation(index) {
-  ui.$starButtons.removeClass("is-active").eq(index).addClass("is-active");
-  ui.$lineElements.each((lineIndex, line) => $(line).toggleClass("is-active", lineIndex < index));
-  ui.$messageCopy.text(content.constellationMessages[index]);
-  flash(ui.$messageCopy.get(0));
+  ui.starButtons.forEach((button, buttonIndex) => {
+    toggleClass(button, "is-active", buttonIndex === index);
+  });
+
+  ui.lineElements.forEach((line, lineIndex) => {
+    toggleClass(line, "is-active", lineIndex < index);
+  });
+
+  setText(ui.messageCopy, content.constellationMessages[index]);
+  flash(ui.messageCopy);
 }
 
 function layoutConstellation() {
-  if (!ui.$constellationMap.length) {
+  if (!ui.constellationMap) {
     return;
   }
 
-  const points = ui.$starButtons.toArray().map((button) => ({
+  const points = ui.starButtons.map((button) => ({
     left: button.offsetLeft + button.offsetWidth / 2,
     top: button.offsetTop + button.offsetHeight / 2,
   }));
 
   points.slice(0, -1).forEach((point, index) => {
     const next = points[index + 1];
-    const line = ui.$lineElements.get(index);
+    const line = ui.lineElements[index];
 
     if (!line || !next) {
       return;
@@ -120,7 +149,7 @@ function layoutConstellation() {
     const length = Math.hypot(next.left - point.left, next.top - point.top);
     const angle = Math.atan2(next.top - point.top, next.left - point.left);
 
-    Object.assign(line.style, {
+    setStyles(line, {
       width: `${length}px`,
       left: `${point.left}px`,
       top: `${point.top}px`,
@@ -130,20 +159,30 @@ function layoutConstellation() {
 }
 
 function setPickedButton(picked = "") {
-  ui.$qaYes.toggleClass("is-picked", picked === "yes");
-  ui.$qaNo.toggleClass("is-picked", picked === "no");
+  toggleClass(ui.qaYes, "is-picked", picked === "yes");
+  toggleClass(ui.qaNo, "is-picked", picked === "no");
 }
 
 function renderQaStep() {
-  ui.$qaPrompt.text(content.qaFlow[state.qaIndex].prompt);
-  ui.$qaStep.text(
+  const currentStep = content.qaFlow[state.qaIndex];
+
+  if (!currentStep) {
+    return;
+  }
+
+  setText(ui.qaPrompt, currentStep.prompt);
+  setText(
+    ui.qaStep,
     `${String(state.qaIndex + 1).padStart(2, "0")} / ${String(content.qaFlow.length).padStart(2, "0")}`,
   );
-  ui.$qaDots.each((index, dot) => $(dot).toggleClass("is-active", index === state.qaIndex));
+
+  ui.qaDots.forEach((dot, index) => {
+    toggleClass(dot, "is-active", index === state.qaIndex);
+  });
 }
 
 function animateQaBlock() {
-  flash(ui.$qaResponseCard.get(0), {
+  flash(ui.qaResponseCard, {
     opacity: [0.72, 1],
     y: [10, 0],
     scale: [0.985, 1],
@@ -156,10 +195,14 @@ function resetQa() {
   state.qaIndex = 0;
   renderQaStep();
   setPickedButton();
-  ui.$qaResponse.text("The sky is listening.");
-  ui.$qaSubtext.text("Choose either side and the mood will shift with you.");
-  ui.$qaTag.text("waiting softly");
-  ui.$ambientSlider.val("72");
+  setText(ui.qaResponse, "The sky is listening.");
+  setText(ui.qaSubtext, "Choose either side and the mood will shift with you.");
+  setText(ui.qaTag, "waiting softly");
+
+  if (ui.ambientSlider) {
+    ui.ambientSlider.value = "72";
+  }
+
   setAmbientValue(72);
   activateConstellation(2);
   animateQaBlock();
@@ -180,10 +223,14 @@ function answerQa(choice) {
 
   state.qaLocked = true;
   setPickedButton(choice);
-  ui.$qaResponse.text(response);
-  ui.$qaSubtext.text(subtext);
-  ui.$qaTag.text(tag);
-  ui.$ambientSlider.val(String(ambient));
+  setText(ui.qaResponse, response);
+  setText(ui.qaSubtext, subtext);
+  setText(ui.qaTag, tag);
+
+  if (ui.ambientSlider) {
+    ui.ambientSlider.value = String(ambient);
+  }
+
   setAmbientValue(ambient);
   activateConstellation(star);
   animateQaBlock();
@@ -198,30 +245,33 @@ function answerQa(choice) {
 }
 
 function initStars() {
-  if (!ui.$stars.length) {
+  if (!ui.stars) {
     return;
   }
 
   const starCount = window.innerWidth < 640 ? 50 : 82;
   const fragment = document.createDocumentFragment();
 
-  Array.from({ length: starCount }).forEach(() => {
+  ui.dynamicStars = Array.from({ length: starCount }, () => {
     const star = document.createElement("span");
     const size = Math.random() * 2.3 + 0.8;
 
     star.className = "star";
-    star.style.width = `${size}px`;
-    star.style.height = `${size}px`;
-    star.style.left = `${Math.random() * 100}%`;
-    star.style.top = `${Math.random() * 100}%`;
-    star.style.opacity = `${Math.random() * 0.65 + 0.2}`;
+    setStyles(star, {
+      width: `${size}px`,
+      height: `${size}px`,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      opacity: `${Math.random() * 0.65 + 0.2}`,
+    });
     star.style.setProperty("--twinkle-duration", `${Math.random() * 4 + 3}s`);
     star.style.setProperty("--twinkle-delay", `${Math.random() * 5}s`);
     star.dataset.depth = `${Math.random() * 8 + 4}`;
     fragment.appendChild(star);
+    return star;
   });
 
-  ui.$stars.append(fragment);
+  ui.stars.appendChild(fragment);
 }
 
 function initMotion() {
@@ -241,47 +291,57 @@ function initMotion() {
 }
 
 function initAmbient() {
-  if (!ui.$ambientSlider.length) {
+  if (!ui.ambientSlider) {
     return;
   }
 
-  setAmbientValue(ui.$ambientSlider.val());
-  ui.$ambientSlider.on("input", (event) => setAmbientValue(event.target.value));
+  setAmbientValue(ui.ambientSlider.value);
+  ui.ambientSlider.addEventListener("input", (event) => setAmbientValue(event.target.value));
 }
 
 function initConstellation() {
-  ui.$starButtons.on("click", function handleStarClick() {
-    activateConstellation(Number($(this).data("index")));
+  ui.starButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      activateConstellation(Number(button.dataset.index));
+    });
   });
 
   activateConstellation(2);
   layoutConstellation();
-  ui.$win.on("load resize", layoutConstellation);
+  window.addEventListener("load", layoutConstellation);
+  window.addEventListener("resize", layoutConstellation);
 }
 
 function initMoodSwitcher() {
-  ui.$shuffleButton.on("click", () => {
+  if (!ui.shuffleButton) {
+    return;
+  }
+
+  ui.shuffleButton.addEventListener("click", () => {
     state.moodIndex = (state.moodIndex + 1) % content.microLines.length;
-    ui.$microLine.text(content.microLines[state.moodIndex]);
+    setText(ui.microLine, content.microLines[state.moodIndex]);
     activateConstellation(state.moodIndex);
-    flash(ui.$microLine.get(0), { opacity: [0.4, 1], y: [10, 0] });
+    flash(ui.microLine, { opacity: [0.4, 1], y: [10, 0] });
   });
 }
 
 function initQa() {
   renderQaStep();
-  ui.$qaYes.on("click", () => answerQa("yes"));
-  ui.$qaNo.on("click", () => answerQa("no"));
-  ui.$qaReset.on("click", resetQa);
+  ui.qaYes?.addEventListener("click", () => answerQa("yes"));
+  ui.qaNo?.addEventListener("click", () => answerQa("no"));
+  ui.qaReset?.addEventListener("click", resetQa);
 }
 
 function setTargetFromPoint(clientX, clientY) {
   state.pointer.targetX = (clientX / window.innerWidth - 0.5) * 2;
   state.pointer.targetY = (clientY / window.innerHeight - 0.5) * 2;
-  ui.$cursorGlow.css({
-    "--pointer-x": `${(clientX / window.innerWidth) * 100}%`,
-    "--pointer-y": `${(clientY / window.innerHeight) * 100}%`,
-  });
+
+  if (!ui.cursorGlow) {
+    return;
+  }
+
+  ui.cursorGlow.style.setProperty("--pointer-x", `${(clientX / window.innerWidth) * 100}%`);
+  ui.cursorGlow.style.setProperty("--pointer-y", `${(clientY / window.innerHeight) * 100}%`);
 }
 
 function resetPointerTarget() {
@@ -293,18 +353,18 @@ function renderParallax() {
   state.pointer.currentX += (state.pointer.targetX - state.pointer.currentX) * 0.07;
   state.pointer.currentY += (state.pointer.targetY - state.pointer.currentY) * 0.07;
 
-  ui.$parallaxTargets.each((_, element) => {
+  ui.parallaxTargets.forEach((element) => {
     const depth = Number(element.dataset.depth || 0);
     element.style.transform = `translate3d(${state.pointer.currentX * depth}px, ${state.pointer.currentY * depth}px, 0)`;
   });
 
-  ui.$stars.find(".star").each((_, star) => {
+  ui.dynamicStars.forEach((star) => {
     const depth = Number(star.dataset.depth || 0);
     star.style.translate = `${state.pointer.currentX * depth}px ${state.pointer.currentY * depth}px`;
   });
 
-  if (ui.$heroCard.length) {
-    ui.$heroCard.get(0).style.transform =
+  if (ui.heroCard) {
+    ui.heroCard.style.transform =
       `perspective(1200px) rotateX(${state.pointer.currentY * -3.5}deg) rotateY(${state.pointer.currentX * 4.5}deg) translate3d(0, ${state.pointer.currentY * 5}px, 0)`;
   }
 
@@ -316,19 +376,22 @@ function initParallax() {
     return;
   }
 
-  ui.$win.on("mousemove", (event) => setTargetFromPoint(event.clientX, event.clientY));
-  ui.$win.on("touchmove", (event) => {
-    const touch = event.originalEvent.touches?.[0];
+  window.addEventListener("mousemove", (event) => setTargetFromPoint(event.clientX, event.clientY));
+  window.addEventListener("touchmove", (event) => {
+    const touch = event.touches?.[0];
 
     if (touch) {
       setTargetFromPoint(touch.clientX, touch.clientY);
     }
   });
-  ui.$win.on("mouseleave touchend touchcancel blur", resetPointerTarget);
+
+  ["mouseleave", "touchend", "touchcancel", "blur"].forEach((eventName) => {
+    window.addEventListener(eventName, resetPointerTarget);
+  });
 
   setTargetFromPoint(window.innerWidth * 0.5, window.innerHeight * 0.35);
   state.parallaxFrameId = window.requestAnimationFrame(renderParallax);
-  ui.$win.on("beforeunload", () => window.cancelAnimationFrame(state.parallaxFrameId));
+  window.addEventListener("beforeunload", () => window.cancelAnimationFrame(state.parallaxFrameId));
 }
 
 function init() {
@@ -342,4 +405,8 @@ function init() {
   initParallax();
 }
 
-$(init);
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init, { once: true });
+} else {
+  init();
+}
