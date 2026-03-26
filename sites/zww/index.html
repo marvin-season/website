@@ -9,6 +9,7 @@
     />
     <title>A Quiet Sky</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <style>
       :root {
         color-scheme: dark;
@@ -515,28 +516,30 @@
 
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const root = document.documentElement;
-      const starField = document.querySelector("#stars");
-      const cursorGlow = document.querySelector("#cursor-glow");
-      const parallaxTargets = [...document.querySelectorAll("[data-parallax]")];
-      const heroCard = document.querySelector("[data-parallax-card]");
-      const shuffleButton = document.querySelector("#shuffle-button");
-      const microLine = document.querySelector("#micro-line");
-      const messageCopy = document.querySelector("#message-copy");
-      const ambientSlider = document.querySelector("#ambient-slider");
-      const ambientValue = document.querySelector("#ambient-value");
-      const constellationMap = document.querySelector("#constellation-map");
-      const starButtons = [...document.querySelectorAll("[data-star]")];
-      const lineElements = [...document.querySelectorAll("[data-line]")];
-      const qaPrompt = document.querySelector("#qa-prompt");
-      const qaStep = document.querySelector("#qa-step");
-      const qaResponse = document.querySelector("#qa-response");
-      const qaSubtext = document.querySelector("#qa-subtext");
-      const qaTag = document.querySelector("#qa-tag");
-      const qaResponseCard = document.querySelector("#qa-response-card");
-      const qaYes = document.querySelector("#qa-yes");
-      const qaNo = document.querySelector("#qa-no");
-      const qaReset = document.querySelector("#qa-reset");
-      const qaDots = [...document.querySelectorAll("[data-qa-dot]")];
+      const $win = $(window);
+      const $root = $(root);
+      const $stars = $("#stars");
+      const $cursorGlow = $("#cursor-glow");
+      const $parallaxTargets = $("[data-parallax]");
+      const $heroCard = $("[data-parallax-card]");
+      const $shuffleButton = $("#shuffle-button");
+      const $microLine = $("#micro-line");
+      const $messageCopy = $("#message-copy");
+      const $ambientSlider = $("#ambient-slider");
+      const $ambientValue = $("#ambient-value");
+      const $constellationMap = $("#constellation-map");
+      const $starButtons = $("[data-star]");
+      const $lineElements = $("[data-line]");
+      const $qaPrompt = $("#qa-prompt");
+      const $qaStep = $("#qa-step");
+      const $qaResponse = $("#qa-response");
+      const $qaSubtext = $("#qa-subtext");
+      const $qaTag = $("#qa-tag");
+      const $qaResponseCard = $("#qa-response-card");
+      const $qaYes = $("#qa-yes");
+      const $qaNo = $("#qa-no");
+      const $qaReset = $("#qa-reset");
+      const $qaDots = $("[data-qa-dot]");
 
       const microLines = ["Still you.", "Quietly, you.", "Soft and sure.", "You stay warm.", "My calm light."];
       const constellationMessages = [
@@ -549,64 +552,137 @@
       const qaFlow = [
         {
           prompt: "Stay a little longer?",
-          yes: {
-            response: "Good. The night gets better with you in it.",
-            subtext: "A soft yes adds a little more light.",
-            tag: "staying close",
-            ambient: 82,
-            star: 3,
-          },
-          no: {
-            response: "That's okay. The light can wait for you.",
-            subtext: "A gentle no still leaves the sky open.",
-            tag: "holding space",
-            ambient: 62,
-            star: 1,
-          },
+          yes: ["Good. The night gets better with you in it.", "A soft yes adds a little more light.", "staying close", 82, 3],
+          no: ["That's okay. The light can wait for you.", "A gentle no still leaves the sky open.", "holding space", 62, 1],
         },
         {
           prompt: "Should the sky glow brighter?",
-          yes: {
-            response: "Done. Just enough to feel it.",
-            subtext: "A brighter sky, not a louder one.",
-            tag: "turning up softly",
-            ambient: 92,
-            star: 4,
-          },
-          no: {
-            response: "Then we keep it dim and honest.",
-            subtext: "Low light. Clear feeling.",
-            tag: "keeping it quiet",
-            ambient: 54,
-            star: 0,
-          },
+          yes: ["Done. Just enough to feel it.", "A brighter sky, not a louder one.", "turning up softly", 92, 4],
+          no: ["Then we keep it dim and honest.", "Low light. Clear feeling.", "keeping it quiet", 54, 0],
         },
         {
           prompt: "Is this already enough?",
-          yes: {
-            response: "Then let this be enough, beautifully.",
-            subtext: "No extra words. Just a steady feeling.",
-            tag: "enough already",
-            ambient: 74,
-            star: 2,
-          },
-          no: {
-            response: "Then the stars can keep trying for us.",
-            subtext: "No rush. The page knows how to stay.",
-            tag: "still unfolding",
-            ambient: 80,
-            star: 4,
-          },
+          yes: ["Then let this be enough, beautifully.", "No extra words. Just a steady feeling.", "enough already", 74, 2],
+          no: ["Then the stars can keep trying for us.", "No rush. The page knows how to stay.", "still unfolding", 80, 4],
         },
       ];
+
+      let moodIndex = 0;
       let qaIndex = 0;
       let qaLocked = false;
       let qaAdvanceTimer = 0;
 
-      if (starField) {
-        const starCount = window.innerWidth < 640 ? 50 : 82;
+      const flash = (target, props = { opacity: [0.45, 1], y: [8, 0] }) =>
+        animate(target, props, { duration: 0.35, easing: "ease-out" });
 
-        for (let i = 0; i < starCount; i += 1) {
+      const setAmbientValue = (value) => {
+        const amount = Number(value);
+        $root.css({ "--glow-strength": String(amount / 100), "--sky-accent": String(amount / 100) });
+        $ambientValue.text(`${amount}%`);
+      };
+
+      const activateConstellation = (index) => {
+        $starButtons.removeClass("is-active").eq(index).addClass("is-active");
+        $lineElements.each((lineIndex, line) => $(line).toggleClass("is-active", lineIndex < index));
+        $messageCopy.text(constellationMessages[index]);
+        flash($messageCopy.get(0));
+      };
+
+      const layoutConstellation = () => {
+        if (!$constellationMap.length) {
+          return;
+        }
+
+        const points = $starButtons
+          .toArray()
+          .map((button) => ({ left: button.offsetLeft + button.offsetWidth / 2, top: button.offsetTop + button.offsetHeight / 2 }));
+
+        points.slice(0, -1).forEach((point, index) => {
+          const next = points[index + 1];
+          const line = $lineElements.get(index);
+
+          if (!line || !next) {
+            return;
+          }
+
+          const length = Math.hypot(next.left - point.left, next.top - point.top);
+          const angle = Math.atan2(next.top - point.top, next.left - point.left);
+
+          Object.assign(line.style, {
+            width: `${length}px`,
+            left: `${point.left}px`,
+            top: `${point.top}px`,
+            transform: `rotate(${angle}rad)`,
+          });
+        });
+      };
+
+      const setPickedButton = (picked = "") => {
+        $qaYes.toggleClass("is-picked", picked === "yes");
+        $qaNo.toggleClass("is-picked", picked === "no");
+      };
+
+      const renderQaStep = () => {
+        $qaPrompt.text(qaFlow[qaIndex].prompt);
+        $qaStep.text(`${String(qaIndex + 1).padStart(2, "0")} / ${String(qaFlow.length).padStart(2, "0")}`);
+        $qaDots.each((index, dot) => $(dot).toggleClass("is-active", index === qaIndex));
+      };
+
+      const animateQaBlock = () =>
+        flash($qaResponseCard.get(0), { opacity: [0.72, 1], y: [10, 0], scale: [0.985, 1] });
+
+      const resetQa = () => {
+        window.clearTimeout(qaAdvanceTimer);
+        qaLocked = false;
+        qaIndex = 0;
+        renderQaStep();
+        setPickedButton();
+        $qaResponse.text("The sky is listening.");
+        $qaSubtext.text("Choose either side and the mood will shift with you.");
+        $qaTag.text("waiting softly");
+        $ambientSlider.val("72");
+        setAmbientValue(72);
+        activateConstellation(2);
+        animateQaBlock();
+      };
+
+      const answerQa = (choice) => {
+        if (qaLocked) {
+          return;
+        }
+
+        const result = qaFlow[qaIndex]?.[choice];
+
+        if (!result) {
+          return;
+        }
+
+        const [response, subtext, tag, ambient, star] = result;
+
+        qaLocked = true;
+        setPickedButton(choice);
+        $qaResponse.text(response);
+        $qaSubtext.text(subtext);
+        $qaTag.text(tag);
+        $ambientSlider.val(String(ambient));
+        setAmbientValue(ambient);
+        activateConstellation(star);
+        animateQaBlock();
+
+        window.clearTimeout(qaAdvanceTimer);
+        qaAdvanceTimer = window.setTimeout(() => {
+          qaIndex = (qaIndex + 1) % qaFlow.length;
+          renderQaStep();
+          setPickedButton();
+          qaLocked = false;
+        }, 520);
+      };
+
+      if ($stars.length) {
+        const starCount = window.innerWidth < 640 ? 50 : 82;
+        const fragment = document.createDocumentFragment();
+
+        Array.from({ length: starCount }).forEach(() => {
           const star = document.createElement("span");
           const size = Math.random() * 2.3 + 0.8;
 
@@ -619,9 +695,10 @@
           star.style.setProperty("--twinkle-duration", `${Math.random() * 4 + 3}s`);
           star.style.setProperty("--twinkle-delay", `${Math.random() * 5}s`);
           star.dataset.depth = `${Math.random() * 8 + 4}`;
+          fragment.appendChild(star);
+        });
 
-          starField.appendChild(star);
-        }
+        $stars.append(fragment);
       }
 
       animate(
@@ -638,211 +715,30 @@
         );
       });
 
-      const setAmbientValue = (value) => {
-        const amount = Number(value);
-        root.style.setProperty("--glow-strength", String(amount / 100));
-        root.style.setProperty("--sky-accent", String(amount / 100));
-
-        if (ambientValue) {
-          ambientValue.textContent = `${amount}%`;
-        }
-      };
-
-      if (ambientSlider) {
-        setAmbientValue(ambientSlider.value);
-        ambientSlider.addEventListener("input", (event) => {
-          setAmbientValue(event.target.value);
-        });
+      if ($ambientSlider.length) {
+        setAmbientValue($ambientSlider.val());
+        $ambientSlider.on("input", (event) => setAmbientValue(event.target.value));
       }
 
-      const activateConstellation = (index) => {
-        starButtons.forEach((button, buttonIndex) => {
-          button.classList.toggle("is-active", buttonIndex === index);
-        });
-
-        lineElements.forEach((line, lineIndex) => {
-          line.classList.toggle("is-active", lineIndex < index);
-        });
-
-        if (messageCopy) {
-          messageCopy.textContent = constellationMessages[index];
-          animate(messageCopy, { opacity: [0.45, 1], y: [8, 0] }, { duration: 0.35, easing: "ease-out" });
-        }
-      };
-
-      const layoutConstellation = () => {
-        if (!constellationMap) {
-          return;
-        }
-
-        const points = starButtons.map((button) => {
-          const left = button.offsetLeft + button.offsetWidth / 2;
-          const top = button.offsetTop + button.offsetHeight / 2;
-          return { left, top };
-        });
-
-        points.slice(0, -1).forEach((point, index) => {
-          const next = points[index + 1];
-          const line = lineElements[index];
-
-          if (!line || !next) {
-            return;
-          }
-
-          const length = Math.hypot(next.left - point.left, next.top - point.top);
-          const angle = Math.atan2(next.top - point.top, next.left - point.left);
-
-          line.style.width = `${length}px`;
-          line.style.left = `${point.left}px`;
-          line.style.top = `${point.top}px`;
-          line.style.transform = `rotate(${angle}rad)`;
-        });
-      };
-
-      starButtons.forEach((button, index) => {
-        button.addEventListener("click", () => {
-          activateConstellation(index);
-        });
+      $starButtons.on("click", function () {
+        activateConstellation(Number($(this).data("index")));
       });
 
+      $shuffleButton.on("click", () => {
+        moodIndex = (moodIndex + 1) % microLines.length;
+        $microLine.text(microLines[moodIndex]);
+        activateConstellation(moodIndex);
+        flash($microLine.get(0), { opacity: [0.4, 1], y: [10, 0] });
+      });
+
+      $qaYes.on("click", () => answerQa("yes"));
+      $qaNo.on("click", () => answerQa("no"));
+      $qaReset.on("click", resetQa);
+
       activateConstellation(2);
-      window.addEventListener("resize", layoutConstellation);
-      window.addEventListener("load", layoutConstellation);
-      layoutConstellation();
-
-      if (shuffleButton && microLine) {
-        let moodIndex = 0;
-
-        shuffleButton.addEventListener("click", () => {
-          moodIndex = (moodIndex + 1) % microLines.length;
-          microLine.textContent = microLines[moodIndex];
-          activateConstellation(moodIndex);
-          animate(microLine, { opacity: [0.4, 1], y: [10, 0] }, { duration: 0.35, easing: "ease-out" });
-        });
-      }
-
-      const renderQaStep = () => {
-        if (qaPrompt) {
-          qaPrompt.textContent = qaFlow[qaIndex].prompt;
-        }
-
-        if (qaStep) {
-          qaStep.textContent = `${String(qaIndex + 1).padStart(2, "0")} / ${String(qaFlow.length).padStart(2, "0")}`;
-        }
-
-        qaDots.forEach((dot, index) => {
-          dot.classList.toggle("is-active", index === qaIndex);
-        });
-      };
-
-      const setPickedButton = (picked) => {
-        if (qaYes) {
-          qaYes.classList.toggle("is-picked", picked === "yes");
-        }
-        if (qaNo) {
-          qaNo.classList.toggle("is-picked", picked === "no");
-        }
-      };
-
-      const animateQaBlock = () => {
-        if (qaResponseCard) {
-          animate(
-            qaResponseCard,
-            { opacity: [0.72, 1], y: [10, 0], scale: [0.985, 1] },
-            { duration: 0.35, easing: "ease-out" },
-          );
-        }
-      };
-
-      const answerQa = (choice) => {
-        if (qaLocked) {
-          return;
-        }
-
-        const result = qaFlow[qaIndex]?.[choice];
-
-        if (!result) {
-          return;
-        }
-
-        qaLocked = true;
-        setPickedButton(choice);
-
-        if (qaResponse) {
-          qaResponse.textContent = result.response;
-        }
-
-        if (qaSubtext) {
-          qaSubtext.textContent = result.subtext;
-        }
-
-        if (qaTag) {
-          qaTag.textContent = result.tag;
-        }
-
-        if (ambientSlider) {
-          ambientSlider.value = String(result.ambient);
-          setAmbientValue(result.ambient);
-        }
-
-        if (typeof result.star === "number") {
-          activateConstellation(result.star);
-        }
-
-        animateQaBlock();
-
-        window.clearTimeout(qaAdvanceTimer);
-        qaAdvanceTimer = window.setTimeout(() => {
-          qaIndex = (qaIndex + 1) % qaFlow.length;
-          renderQaStep();
-          setPickedButton("");
-          qaLocked = false;
-        }, 520);
-      };
-
-      if (qaYes) {
-        qaYes.addEventListener("click", () => {
-          answerQa("yes");
-        });
-      }
-
-      if (qaNo) {
-        qaNo.addEventListener("click", () => {
-          answerQa("no");
-        });
-      }
-
-      if (qaReset) {
-        qaReset.addEventListener("click", () => {
-          window.clearTimeout(qaAdvanceTimer);
-          qaLocked = false;
-          qaIndex = 0;
-          renderQaStep();
-          setPickedButton("");
-
-          if (qaResponse) {
-            qaResponse.textContent = "The sky is listening.";
-          }
-
-          if (qaSubtext) {
-            qaSubtext.textContent = "Choose either side and the mood will shift with you.";
-          }
-
-          if (qaTag) {
-            qaTag.textContent = "waiting softly";
-          }
-
-          if (ambientSlider) {
-            ambientSlider.value = "72";
-            setAmbientValue(72);
-          }
-
-          activateConstellation(2);
-          animateQaBlock();
-        });
-      }
-
       renderQaStep();
+      layoutConstellation();
+      $win.on("load resize", layoutConstellation);
 
       if (!prefersReducedMotion) {
         const state = { currentX: 0, currentY: 0, targetX: 0, targetY: 0 };
@@ -851,39 +747,10 @@
         const setTargetFromPoint = (clientX, clientY) => {
           state.targetX = (clientX / window.innerWidth - 0.5) * 2;
           state.targetY = (clientY / window.innerHeight - 0.5) * 2;
-
-          if (cursorGlow) {
-            cursorGlow.style.setProperty("--pointer-x", `${(clientX / window.innerWidth) * 100}%`);
-            cursorGlow.style.setProperty("--pointer-y", `${(clientY / window.innerHeight) * 100}%`);
-          }
-        };
-
-        const renderParallax = () => {
-          state.currentX += (state.targetX - state.currentX) * 0.07;
-          state.currentY += (state.targetY - state.currentY) * 0.07;
-
-          parallaxTargets.forEach((element) => {
-            const depth = Number(element.dataset.depth || 0);
-            element.style.transform = `translate3d(${state.currentX * depth}px, ${state.currentY * depth}px, 0)`;
+          $cursorGlow.css({
+            "--pointer-x": `${(clientX / window.innerWidth) * 100}%`,
+            "--pointer-y": `${(clientY / window.innerHeight) * 100}%`,
           });
-
-          if (starField) {
-            starField.querySelectorAll(".star").forEach((star) => {
-              const depth = Number(star.dataset.depth || 0);
-              star.style.translate = `${state.currentX * depth}px ${state.currentY * depth}px`;
-            });
-          }
-
-          if (heroCard) {
-            const rotateY = state.currentX * 4.5;
-            const rotateX = state.currentY * -3.5;
-            const moveY = state.currentY * 5;
-
-            heroCard.style.transform =
-              `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translate3d(0, ${moveY}px, 0)`;
-          }
-
-          frameId = window.requestAnimationFrame(renderParallax);
         };
 
         const resetTarget = () => {
@@ -891,33 +758,40 @@
           state.targetY = 0;
         };
 
-        window.addEventListener("mousemove", (event) => {
-          setTargetFromPoint(event.clientX, event.clientY);
+        const renderParallax = () => {
+          state.currentX += (state.targetX - state.currentX) * 0.07;
+          state.currentY += (state.targetY - state.currentY) * 0.07;
+
+          $parallaxTargets.each((_, element) => {
+            const depth = Number(element.dataset.depth || 0);
+            element.style.transform = `translate3d(${state.currentX * depth}px, ${state.currentY * depth}px, 0)`;
+          });
+
+          $stars.find(".star").each((_, star) => {
+            const depth = Number(star.dataset.depth || 0);
+            star.style.translate = `${state.currentX * depth}px ${state.currentY * depth}px`;
+          });
+
+          if ($heroCard.length) {
+            $heroCard.get(0).style.transform =
+              `perspective(1200px) rotateX(${state.currentY * -3.5}deg) rotateY(${state.currentX * 4.5}deg) translate3d(0, ${state.currentY * 5}px, 0)`;
+          }
+
+          frameId = window.requestAnimationFrame(renderParallax);
+        };
+
+        $win.on("mousemove", (event) => setTargetFromPoint(event.clientX, event.clientY));
+        $win.on("touchmove", (event) => {
+          const touch = event.originalEvent.touches?.[0];
+          if (touch) {
+            setTargetFromPoint(touch.clientX, touch.clientY);
+          }
         });
-
-        window.addEventListener(
-          "touchmove",
-          (event) => {
-            const touch = event.touches[0];
-
-            if (touch) {
-              setTargetFromPoint(touch.clientX, touch.clientY);
-            }
-          },
-          { passive: true },
-        );
-
-        window.addEventListener("mouseleave", resetTarget);
-        window.addEventListener("touchend", resetTarget);
-        window.addEventListener("touchcancel", resetTarget);
-        window.addEventListener("blur", resetTarget);
+        $win.on("mouseleave touchend touchcancel blur", resetTarget);
 
         setTargetFromPoint(window.innerWidth * 0.5, window.innerHeight * 0.35);
         frameId = window.requestAnimationFrame(renderParallax);
-
-        window.addEventListener("beforeunload", () => {
-          window.cancelAnimationFrame(frameId);
-        });
+        $win.on("beforeunload", () => window.cancelAnimationFrame(frameId));
       }
     </script>
   </body>
